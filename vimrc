@@ -7,44 +7,49 @@ autocmd FileType php set omnifunc=phpcomplete#CompletePHP
 autocmd FileType c set omnifunc=ccomplete#Complete
 autocmd FileType ruby,eruby set omnifunc=rubycomplete#Complete
 autocmd FileType ruby,perl,tex,groovy set shiftwidth=2
- 
 autocmd FileType c,cpp,java,javascript,python,xml,xhtml,html set shiftwidth=2
- 
-augroup filetypedetect
-  au! BufNewFile,BufRead *.ch setf cheat
-  au BufNewFile,BufRead *.liquid setf liquid
-  au! BufRead,BufNewFile *.haml setfiletype haml
-  autocmd BufNewFile,BufRead *.yml setf eruby
-augroup END
- 
-autocmd BufNewFile,BufRead *_test.rb source ~/.vim/ftplugin/shoulda.vim
-"use \rci in normal mode to indent ruby code,should install kode ,sudo gem
-"install kode
-nmap <leader>rci :%!ruby-code-indenter<cr>
- 
 autocmd FileType ruby,eruby set omnifunc=rubycomplete#Complete
 autocmd FileType ruby,eruby let g:rubycomplete_buffer_loading = 1
 autocmd FileType ruby,eruby let g:rubycomplete_rails = 1
 autocmd FileType ruby,eruby let g:rubycomplete_classes_in_global = 1
+autocmd BufNewFile,BufRead *_test.rb source ~/.vim/ftplugin/shoulda.vim
+ 
+augroup filetypedetect
+  au! BufNewFile,BufRead *.ch setf cheat
+  au BufNewFile,BufRead *.liquid setf liquid
+  au BufNewFile,BufRead *.vcl set filetype=c
+  au! BufRead,BufNewFile *.haml setfiletype haml
+  autocmd BufNewFile,BufRead *.yml setf eruby
+augroup END
+
+augroup myfiletypes
+  " Clear old autocmds in group
+  autocmd!
+  " autoindent with two spaces, always expand tabs
+  autocmd FileType ruby,eruby,yaml set ai sw=2 sts=2 et
+augroup END
  
 " Change which file opens after executing :Rails command
 let g:rails_default_file='config/database.yml'
  
+filetype plugin indent on " Enable filetype-specific indenting and plugins
 set nocompatible          " We're running Vim, not Vi!
 set guifont=Monaco:h12.5
 set guitablabel=%M%t
 set nobackup
 set nowritebackup
 set path=$PWD/public/**,$PWD/**
-filetype plugin indent on " Enable filetype-specific indenting and plugins
 set sessionoptions=blank,buffers,curdir,folds,help,resize,tabpages,winsize
 set guioptions-=m
 set statusline=%<%f\ %h%m%r%=%-20.(line=%l,col=%c%V,totlin=%L%)\%h%m%r%=%-40(,%n%Y%)\%P
 set laststatus=2
 
+nmap <leader>rci :%!ruby-code-indenter<cr>
+
 map <C-q> :mksession! ~/.vim/.session <cr>
 map <C-//> map ,# :s/^/#/<CR>
 map <S-//> :s/^\/\/\\|^--\\|^> \\|^[#"%!;]//<CR><Esc>:nohlsearch<CR>
+
 imap <M-Up> :tabn<CR>
 imap <M-Down> :tabp<CR>
 imap <c-s> <esc><c-s>
@@ -61,7 +66,6 @@ else
   colorscheme molokai
 endif
 
-
 if $COLORTERM == 'gnome-terminal'
   set term=gnome-256color
   colorscheme molokai
@@ -69,19 +73,13 @@ else
   colorscheme molokai
 endif
 
-syntax on                 " Enable syntax highlighting
+" Enable syntax highlighting
+syntax on 
  
 set nonumber
  
-augroup myfiletypes
-  " Clear old autocmds in group
-  autocmd!
-  " autoindent with two spaces, always expand tabs
-  autocmd FileType ruby,eruby,yaml set ai sw=2 sts=2 et
-augroup END
 
 nmap <silent> <Leader>p :NERDTreeToggle<CR>
-
 "make <c-l> clear the highlight as well as redraw
 nnoremap <C-L> :nohls<CR><C-L>
 inoremap <C-L> <C-O>:nohls<CR>
@@ -99,6 +97,7 @@ map <leader>b :FuzzyFinderBuffer<CR>
 map <leader>[ :FuzzyFinderFile<CR>
 map <leader>r :ruby finder.rescan!<CR>
 map ,t :Rake<CR>
+map <C-r> :CommandT<CR>
 
 let g:proj_flags="imstg"
 let g:fuzzy_enumerating_limit=15
@@ -129,7 +128,9 @@ set wrap  " Line wrapping on
 set timeoutlen=250  " Time to wait after ESC (default causes an annoying delay)
  
 " Formatting (some of these are for coding in C and C++)
-set ts=2  " Tabs are 2 spaces
+set softtabstop=2
+set tabstop=8
+set ts=2  
 set bs=2  " Backspace over everything in insert mode
 set shiftwidth=2  " Tabs under smart indent
 set nocp incsearch
@@ -145,6 +146,7 @@ let g:rubycomplete_buffer_loading = 1
 let g:rubycomplete_classes_in_global = 1
 let g:rubycomplete_rails = 1
 let g:SuperTabDefaultCompletionType = "<C-X><C-O>"
+
 " BEGIN rails-toolkit settings
 runtime debian.vim
 runtime macros/rails-toolkit.vim
@@ -173,7 +175,6 @@ function! s:VSetSearch()
 endfunction
 vnoremap * :<C-u>call <SID>VSetSearch()<CR>//<CR>
 vnoremap # :<C-u>call <SID>VSetSearch()<CR>??<CR>
-
 
 "jump to last cursor position when opening a file
 "dont do it when writing a commit log entry
@@ -274,4 +275,14 @@ noremap RR :call OpenRailsDoc(expand('<cword>'))<CR>
  "map <left> <C-w>h
 
 " shortcut for NERD commenter
- map <C-M> ,c<space>
+map <C-M> ,c<space>
+
+" tell vim to keep a backup file
+set backup
+
+" tell vim where to put its backup files
+set backupdir=/private/tmp
+
+" tell vim where to put swap files
+set dir=/private/tmp
+
